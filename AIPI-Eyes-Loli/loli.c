@@ -14,8 +14,12 @@ static inline int loli_draw_picture(uint16_t x1, uint16_t y1, uint16_t x2,
   return lcd_draw_picture_blocking(x1, y1, x2 - 1, y2 - 1, picture);
 }
 
+void loli_frame_decompress(unsigned short *buffer, void *data) {
+  memcpy(buffer, data, LOLI_FRAME_BYTESIZE);
+}
+
 void loli_draw_frame(const unsigned short *frame) {
-  memcpy(loli_buffer, frame, LOLI_FRAME_BYTESIZE);
+  loli_frame_decompress(loli_buffer, frame);
   loli_draw_picture(0, 0, LOLI_FRAME_X, LOLI_FRAME_Y, loli_buffer);
 }
 
