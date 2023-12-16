@@ -1,20 +1,19 @@
 #include "lcd.h"
+#include "loli_image.h"
 
-const loli_img[] = {};
+static inline int draw_picture_blocking(uint16_t x1, uint16_t y1, uint16_t x2,
+                                        uint16_t y2, lcd_color_t *picture) {
+  return lcd_draw_picture_blocking(x1, y1, x2 - 1, y2 - 1, picture);
+}
 
 void loli_draw() {
-  static int i = 0;
-
-  lcd_clear(LCD_COLOR_RGB(i == 1 || i == 4 ? 0xFF : 0x00,
-                          i == 2 || i == 4 ? 0xFF : 0x00,
-                          i == 3 || i == 4 ? 0xFF : 0x00));
-
-  i = i >= 4 ? 0 : i + 1;
+  for (unsigned short i=0; loli_image[i]; i++) {
+    draw_picture_blocking(0, 0, 240, 280, loli_image[i]);
+  }
 }
 
 void loli_task() {
   while (1) {
     loli_draw();
-    vTaskDelay(200);
   }
 }

@@ -16,6 +16,7 @@ target_sources(app PRIVATE
 )
 
 sdk_add_include_directories(.)
+sdk_add_include_directories(loli)
 
 target_sources(app PRIVATE ${sources})
 sdk_set_main_file(main.c)
