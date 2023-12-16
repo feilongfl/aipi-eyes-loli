@@ -60,8 +60,8 @@
 #include "lcd.h"
 #include "portable.h"
   //#include "fhost.h"
-#include "gui_guider.h"
-#include "custom.h"
+// #include "gui_guider.h"
+// #include "custom.h"
 #include "easyflash.h"
 #include "bflb_mtd.h"
 extern xQueueHandle queue;
@@ -72,13 +72,16 @@ extern xQueueHandle queue;
 #define WIFI_STACK_SIZE     (1536)
 #define TASK_PRIORITY_FW    (16)
 
- /****************************************************************************
-  * Private Types
-  ****************************************************************************/
+#define SSID_KEY "SSID"
+#define PASS_KEY "PASS"
 
-  /****************************************************************************
-   * Private Data
-   ****************************************************************************/
+/****************************************************************************
+ * Private Types
+ ****************************************************************************/
+
+/****************************************************************************
+ * Private Data
+ ****************************************************************************/
 
 static struct bflb_device_s* uart0;
 #if 1
@@ -210,20 +213,21 @@ void lv_log_print_g_cb(const char* buf)
     printf("[LVGL] %s", buf);
 }
 
-static TaskHandle_t lvgl_TaskHandle;
-#define LVGL_STACK_SIZE 1024
-#define LVGL_TASK_PRIORITY 15
+static TaskHandle_t loli_TaskHandle;
+#define LOLI_STACK_SIZE 1024
+#define LOLI_TASK_PRIORITY 15
+void loli_task(void *param);
 
-void lvgl_task(void* param)
-{
+// void lvgl_task(void* param)
+// {
 
-    while (1)
-    {
-        lv_task_handler();
-        vTaskDelay(1);
-        // bflb_mtimer_delay_ms(1);
-    }
-}
+//     while (1)
+//     {
+//         lv_task_handler();
+//         vTaskDelay(1);
+//         // bflb_mtimer_delay_ms(1);
+//     }
+// }
 
 void io2_set(uint8_t value)
 {
@@ -302,15 +306,15 @@ void lwip_sntp_init(void)
     printf("getservername:%s\r\n", sntp_getservername(0));
 }
 
-lv_ui guider_ui;
+// lv_ui guider_ui;
 
 int main(void) {
   board_init();
 
   lcd_init();
   lcd_clear(LCD_COLOR_RGB(0x00, 0X00, 0X00));
-  // xTaskCreate(lvgl_task, (char*)"lvgl", LVGL_STACK_SIZE, NULL,
-  // LVGL_TASK_PRIORITY, &lvgl_TaskHandle);
+  xTaskCreate(loli_task, (char *)"loli", LOLI_STACK_SIZE, NULL,
+              LOLI_TASK_PRIORITY, &loli_TaskHandle);
   vTaskStartScheduler();
 
   while (1) {
