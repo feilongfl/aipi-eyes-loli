@@ -304,47 +304,16 @@ void lwip_sntp_init(void)
 
 lv_ui guider_ui;
 
-int main(void)
-{
+int main(void) {
+  board_init();
 
-    board_init();
-    // audio_init();
-    // audio_pcm_init();
-    // es8388_voice_init();
+  lcd_init();
+  lcd_clear(LCD_COLOR_RGB(0x00, 0X00, 0X00));
+  // xTaskCreate(lvgl_task, (char*)"lvgl", LVGL_STACK_SIZE, NULL,
+  // LVGL_TASK_PRIORITY, &lvgl_TaskHandle);
+  vTaskStartScheduler();
 
-    // uart0 = bflb_device_get_by_name("uart0");
-    // shell_init_with_task(uart0);
-
-    // printf("HeapSize:%d\r\n",xPortGetFreeHeapSize());
-    tcpip_init(NULL, NULL);
-    wifi_start_firmware_task();
-    lwip_sntp_init();
-    //init easyflash
-    bflb_mtd_init();
-    easyflash_init();
-    /* lvgl init */
-    lv_log_register_print_cb(lv_log_print_g_cb);
-    lv_init();
-    lv_port_disp_init();
-    lv_port_indev_init();
-
-    setup_ui(&guider_ui);
-
-    printf("lv_task_handler\r\n");
-    // lv_task_handler();
-    custom_init(&guider_ui);
-    printf("lvgl success\r\n");
-    xTaskCreate(lvgl_task, (char*)"lvgl", LVGL_STACK_SIZE, NULL, LVGL_TASK_PRIORITY, &lvgl_TaskHandle);
-    // printf("HeapSize:%d\r\n",xPortGetFreeHeapSize());
-    vTaskStartScheduler();
-
-    // while (1) {
-    //     lv_task_handler();
-    //     bflb_mtimer_delay_ms(1);
-    // }
-
-    while (1) {
-        // printf("\r\n[%s] heap size ------------------- %d\r\n", __func__, xPortGetFreeHeapSize());
-        vTaskDelay(5000/portTICK_RATE_MS);
-    }
+  while (1) {
+    vTaskDelay(5000 / portTICK_RATE_MS);
+  }
 }
