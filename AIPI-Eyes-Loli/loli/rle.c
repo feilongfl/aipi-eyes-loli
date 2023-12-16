@@ -3,10 +3,21 @@
 
 #define RLE_BUFFER_SIZE sizeof(loli_image_0001)
 
+#if 1
 struct rle_data {
   unsigned char data;
   unsigned char length;
 };
+#define RLE_LENGTH_MAX 0xFF
+#elif 0
+struct rle_data {
+  unsigned short data;
+  unsigned short length;
+};
+#define RLE_LENGTH_MAX 0xFFFF
+#else
+#error "must select data type"
+#endif
 
 // struct rle {
 //   unsigned int length;
@@ -23,7 +34,7 @@ size_t RleEncode(struct rle_data *dst, unsigned char *src, size_t size) {
   dst[dstsize].length = 1;
 
   for (size_t i = 1; i < size; i++) {
-    if (dst[dstsize].data == src[i] && dst[dstsize].length < 0xff) {
+    if (dst[dstsize].data == src[i] && dst[dstsize].length < RLE_LENGTH_MAX) {
       dst[dstsize].length++;
     } else {
       if (++dstsize < RLE_BUFFER_SIZE) {
