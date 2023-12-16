@@ -1,10 +1,11 @@
 #include "lcd.h"
 #include "loli_image.h"
 
-#define LOLI_FRAME_X 240
-#define LOLI_FRAME_Y 280
 #define LOLI_FRAME_SIZE LOLI_FRAME_X * LOLI_FRAME_Y
 #define LOLI_FRAME_BYTESIZE LOLI_FRAME_SIZE * 2
+
+#define OFFSET_X ((240 - LOLI_FRAME_X) / 2)
+#define OFFSET_Y ((320 - LOLI_FRAME_Y) / 2)
 
 unsigned char loli_buffer_current = 0;
 unsigned short loli_buffer[LOLI_FRAME_SIZE] = {};
@@ -20,12 +21,15 @@ void loli_frame_decompress(unsigned short *buffer, void *data) {
 
 void loli_draw_frame(const unsigned short *frame) {
   loli_frame_decompress(loli_buffer, frame);
-  loli_draw_picture(0, 0, LOLI_FRAME_X, LOLI_FRAME_Y, loli_buffer);
+  loli_draw_picture(OFFSET_X, OFFSET_Y, OFFSET_X + LOLI_FRAME_X,
+                    OFFSET_Y + LOLI_FRAME_Y, loli_buffer);
 }
 
 void loli_draw() {
   for (unsigned short i = 0; loli_image[i]; i++) {
     loli_draw_frame(loli_image[i]);
+
+    vTaskDelay(30);
   }
 }
 
