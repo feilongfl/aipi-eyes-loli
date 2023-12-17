@@ -15,19 +15,48 @@ static inline int loli_draw_picture(uint16_t x1, uint16_t y1, uint16_t x2,
   return lcd_draw_picture_blocking(x1, y1, x2 - 1, y2 - 1, picture);
 }
 
-void loli_frame_decompress(unsigned short *buffer, void *data) {
-  memcpy(buffer, data, LOLI_FRAME_BYTESIZE);
+void loli_frame_decompress(unsigned short *buffer,
+                           const struct loli_image_data *frame) {
+  // rle decompress & draw to buffer
+  unsigned char *bptr = buffer;
+  unsigned short rle_length;
+
+  // for (size_t i = 0; i < 10; i++) {
+  //   printf("%02x ", frame->data[i]);
+  // }
+  // printf("\r\n");
+
+  for (size_t i = 0; i < frame->length; i++) {
+    if (frame->data[i] == 0x00 || frame->data[i] == 0x01) {
+      // rle codec
+      rle_length = frame->data[i + 2];
+      rle_length <<= 8;
+      rle_length |= frame->data[i + 1];
+      // printf("rle: %d[0x%04x] at %d\r\n", frame->data[i], rle_length, i);
+
+      if (frame->data[i] == 0x00) {
+        while (rle_length--)
+          *bptr++ = frame->data[i];
+      } else {
+        bptr += rle_length;
+      }
+
+      i += 2;
+    } else {
+      *bptr++ = frame->data[i];
+    }
+  }
 }
 
-void loli_draw_frame(const unsigned short *frame) {
+void loli_draw_frame(const struct loli_image_data *frame) {
   loli_frame_decompress(loli_buffer, frame);
   loli_draw_picture(OFFSET_X, OFFSET_Y, OFFSET_X + LOLI_FRAME_X,
                     OFFSET_Y + LOLI_FRAME_Y, loli_buffer);
 }
 
 void loli_draw() {
-  for (unsigned short i = 0; loli_image[i]; i++) {
-    loli_draw_frame(loli_image[i]);
+  for (unsigned short i = 0; loli_image[i].data; i++) {
+    loli_draw_frame(&loli_image[i]);
 
     vTaskDelay(30);
   }
