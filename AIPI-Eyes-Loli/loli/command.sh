@@ -9,8 +9,8 @@ mkdir -p image_crop
 mkdir -p image_crop_240x280
 mkdir -p image_header
 
-w=120
-h=140
+w=150
+h=175
 # 循环遍历其他图片
 for i in $(seq -f "%04g" 1 370)
 do

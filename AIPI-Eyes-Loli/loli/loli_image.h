@@ -369,8 +369,8 @@
 #include "lolis/video_0369.png.raw.diff.rle.h"
 #include "lolis/video_0370.png.raw.diff.rle.h"
 
-#define LOLI_FRAME_X 120
-#define LOLI_FRAME_Y 140
+#define LOLI_FRAME_X 150
+#define LOLI_FRAME_Y 175
 
 struct loli_image_data {
   const unsigned int length;
