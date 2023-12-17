@@ -36,7 +36,7 @@ void loli_frame_decompress(unsigned short *buffer,
 
       if (frame->data[i] == 0x00) {
         while (rle_length--)
-          *bptr++ = frame->data[i];
+          *bptr++ = 0;
       } else {
         bptr += rle_length;
       }
