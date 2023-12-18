@@ -5,7 +5,10 @@
 #define LOLI_FRAME_BYTESIZE LOLI_FRAME_SIZE * 2
 
 #define OFFSET_X ((240 - LOLI_FRAME_X) / 2)
-#define OFFSET_Y ((320 - LOLI_FRAME_Y) / 2)
+#define OFFSET_Y ((320 - LOLI_FRAME_Y) -10)
+
+#define SOFFSET_X ((240 - SIGN_X) / 2)
+#define SOFFSET_Y (20)
 
 unsigned char loli_buffer_current = 0;
 unsigned short loli_buffer[LOLI_FRAME_SIZE] = {};
@@ -63,6 +66,10 @@ void loli_draw() {
 }
 
 void loli_task() {
+  loli_frame_decompress(loli_buffer, &loli_sign);
+  loli_draw_picture(SOFFSET_X, SOFFSET_Y, SOFFSET_X + SIGN_X,
+                    SOFFSET_Y + SIGN_Y, loli_buffer);
+
   while (1) {
     loli_draw();
   }

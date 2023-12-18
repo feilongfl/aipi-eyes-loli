@@ -369,12 +369,22 @@
 #include "lolis/video_0369.png.raw.diff.rle.h"
 #include "lolis/video_0370.png.raw.diff.rle.h"
 
+#include "lolis/sign.rle.h"
+
 #define LOLI_FRAME_X 150
 #define LOLI_FRAME_Y 175
+
+#define SIGN_X 100
+#define SIGN_Y 64
 
 struct loli_image_data {
   const unsigned int length;
   const unsigned char *data;
+};
+
+static const struct loli_image_data loli_sign = {
+    .data = __tests_images_sign_100x150_png_raw_rle,
+    .length = __tests_images_sign_100x150_png_raw_rle_len,
 };
 
 static const struct loli_image_data loli_image[] = {
