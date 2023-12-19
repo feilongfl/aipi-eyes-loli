@@ -18,24 +18,31 @@ static inline int loli_draw_picture(uint16_t x1, uint16_t y1, uint16_t x2,
   return lcd_draw_picture_blocking(x1, y1, x2 - 1, y2 - 1, picture);
 }
 
+unsigned char varint_get(unsigned char *data, size_t *byte_length) {
+  unsigned char number = 0;
+  unsigned char *data_ptr = data;
+  *byte_length = 0;
+
+  do {
+    number |= ((unsigned int)(data_ptr[*byte_length] & 0x80))
+              << (7 * (*byte_length));
+    (*byte_length)++;
+  } while (data_ptr[*byte_length] & 0x80);
+
+  return number;
+}
+
 void loli_frame_decompress(unsigned short *buffer,
                            const struct loli_image_data *frame) {
   // rle decompress & draw to buffer
   unsigned char *bptr = buffer;
   unsigned short rle_length;
-
-  // for (size_t i = 0; i < 10; i++) {
-  //   printf("%02x ", frame->data[i]);
-  // }
-  // printf("\r\n");
+  unsigned char varint_length;
 
   for (size_t i = 0; i < frame->length; i++) {
     if (frame->data[i] == 0x00 || frame->data[i] == 0x01) {
       // rle codec
-      rle_length = frame->data[i + 2];
-      rle_length <<= 8;
-      rle_length |= frame->data[i + 1];
-      // printf("rle: %d[0x%04x] at %d\r\n", frame->data[i], rle_length, i);
+      rle_length = varint_get(frame->data + 1, &varint_length);
 
       if (frame->data[i] == 0x00) {
         while (rle_length--)
@@ -44,7 +51,7 @@ void loli_frame_decompress(unsigned short *buffer,
         bptr += rle_length;
       }
 
-      i += 2;
+      i += varint_length;
     } else {
       *bptr++ = frame->data[i];
     }

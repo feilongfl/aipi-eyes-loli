@@ -1,5 +1,5 @@
-unsigned char tests_images_video_0758_png_raw_diff_rle[] = {
+const unsigned char tests_images_video_0758_png_raw_diff_rle[] = {
   0x01, 0x86, 0xbe, 0x02, 0x40, 0x08, 0x01, 0xa4, 0x3f, 0x25, 0x59, 0x01,
   0xe6, 0x1c
 };
-unsigned int tests_images_video_0758_png_raw_diff_rle_len = 14;
+const unsigned int tests_images_video_0758_png_raw_diff_rle_len = 14;
