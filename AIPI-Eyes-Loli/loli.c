@@ -18,31 +18,30 @@ static inline int loli_draw_picture(uint16_t x1, uint16_t y1, uint16_t x2,
   return lcd_draw_picture_blocking(x1, y1, x2 - 1, y2 - 1, picture);
 }
 
-unsigned char varint_get(unsigned char *data, size_t *byte_length) {
-  unsigned char number = 0;
+size_t varint_get(unsigned char *data, size_t *byte_length) {
+  size_t number = 0;
   unsigned char *data_ptr = data;
   *byte_length = 0;
 
   do {
-    number |= ((unsigned int)(data_ptr[*byte_length] & 0x80))
+    number |= ((unsigned int)(data_ptr[*byte_length] & 0x7F))
               << (7 * (*byte_length));
-    (*byte_length)++;
-  } while (data_ptr[*byte_length] & 0x80);
+  } while (data_ptr[(*byte_length)++] & 0x80);
 
   return number;
 }
 
 void loli_frame_decompress(unsigned short *buffer,
                            const struct loli_image_data *frame) {
-  // rle decompress & draw to buffer
+  // varint rle decompress & draw to buffer
   unsigned char *bptr = buffer;
-  unsigned short rle_length;
+  size_t rle_length;
   unsigned char varint_length;
 
   for (size_t i = 0; i < frame->length; i++) {
     if (frame->data[i] == 0x00 || frame->data[i] == 0x01) {
       // rle codec
-      rle_length = varint_get(frame->data + 1, &varint_length);
+      rle_length = varint_get(frame->data + 1 + i, &varint_length);
 
       if (frame->data[i] == 0x00) {
         while (rle_length--)
@@ -52,6 +51,33 @@ void loli_frame_decompress(unsigned short *buffer,
       }
 
       i += varint_length;
+    } else {
+      *bptr++ = frame->data[i];
+    }
+  }
+}
+
+void loli_frame_decompress_old(unsigned short *buffer,
+                               const struct loli_image_data *frame) {
+  // rle decompress & draw to buffer
+  unsigned char *bptr = buffer;
+  unsigned short rle_length;
+
+  for (size_t i = 0; i < frame->length; i++) {
+    if (frame->data[i] == 0x00 || frame->data[i] == 0x01) {
+      // rle codec
+      rle_length = frame->data[i + 2];
+      rle_length <<= 8;
+      rle_length |= frame->data[i + 1];
+
+      if (frame->data[i] == 0x00) {
+        while (rle_length--)
+          *bptr++ = 0;
+      } else {
+        bptr += rle_length;
+      }
+
+      i += 2;
     } else {
       *bptr++ = frame->data[i];
     }
@@ -73,7 +99,7 @@ void loli_draw() {
 }
 
 void loli_task() {
-  loli_frame_decompress(loli_buffer, &loli_sign);
+  loli_frame_decompress_old(loli_buffer, &loli_sign);
   loli_draw_picture(SOFFSET_X, SOFFSET_Y, SOFFSET_X + SIGN_X,
                     SOFFSET_Y + SIGN_Y, loli_buffer);
 
