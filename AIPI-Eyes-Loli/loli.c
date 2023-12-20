@@ -18,6 +18,12 @@ static inline int loli_draw_picture(uint16_t x1, uint16_t y1, uint16_t x2,
   return lcd_draw_picture_blocking(x1, y1, x2 - 1, y2 - 1, picture);
 }
 
+static inline int loli_draw_picture_nonblocking(uint16_t x1, uint16_t y1,
+                                                uint16_t x2, uint16_t y2,
+                                                lcd_color_t *picture) {
+  return lcd_draw_picture_nonblocking(x1, y1, x2 - 1, y2 - 1, picture);
+}
+
 size_t varint_get(unsigned char *data, size_t *byte_length) {
   size_t number = 0;
   unsigned char *data_ptr = data;
@@ -86,8 +92,8 @@ void loli_frame_decompress_old(unsigned short *buffer,
 
 void loli_draw_frame(const struct loli_image_data *frame) {
   loli_frame_decompress(loli_buffer, frame);
-  loli_draw_picture(OFFSET_X, OFFSET_Y, OFFSET_X + LOLI_FRAME_X,
-                    OFFSET_Y + LOLI_FRAME_Y, loli_buffer);
+  loli_draw_picture_nonblocking(OFFSET_X, OFFSET_Y, OFFSET_X + LOLI_FRAME_X,
+                                OFFSET_Y + LOLI_FRAME_Y, loli_buffer);
 }
 
 void loli_draw() {
