@@ -100,7 +100,7 @@ void loli_draw() {
   for (unsigned short i = 0; loli_image[i].data; i++) {
     loli_draw_frame(&loli_image[i]);
 
-    vTaskDelay(30);
+    vTaskDelay(33);
   }
 }
 
